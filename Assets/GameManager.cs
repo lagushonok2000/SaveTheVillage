@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,6 +23,7 @@ public class GameManager : MonoBehaviour
     public Button warriorButton;
 
     public Text resources;
+    public Text Timer;
 
     public int peasantCost;
     public int warriorCost;
@@ -53,6 +55,8 @@ public class GameManager : MonoBehaviour
     {
         _peasantTimer = new ImgTimer(PeasantTimerImg,this);
         _warriorTimer = new ImgTimer(WarriorTimerImg,this);
+
+        StartCoroutine(TimerCor());
 
         UpdateText();
 
@@ -161,9 +165,48 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void UpdateText()
+    public void UpdateText()
     {
         resources.text = peasantCount + "\n" + warriorsCount + "\n\n" + wheatCount;
+    }
+
+    private IEnumerator TimerCor()
+    {
+        int seconds = 0;
+        int minutes = 0;
+        string time;
+
+        while (true)
+        {
+            seconds++;
+
+            if (seconds > 59)
+            {
+                seconds = 0;
+                minutes++;
+            }
+            if (minutes < 10)
+            {
+                time = "0" + minutes;
+            }
+            else
+            {
+                time = Convert.ToString(minutes);
+            }
+
+            if (seconds < 10)
+            {
+                time += ":0" + seconds;
+            }
+            else
+            {
+                time += ":" + Convert.ToString(seconds);
+            }
+
+            Timer.text= time;
+            yield return new WaitForSeconds(1);
+            
+        }
     }
 }
 
@@ -193,12 +236,15 @@ public class ImgTimer
             {
                 _gmManager.clickPeasantButton = false;
                 _gmManager.peasantButton.interactable = true;
+                _gmManager.peasantCount++;
             }
             else 
             {
                 _gmManager.clickWarriorButton = false;
                 _gmManager.warriorButton.interactable = true;
+                _gmManager.warriorsCount++;
             }
+            _gmManager.UpdateText();
         }
 
         _image.fillAmount = _currentTime / MaxTime;
